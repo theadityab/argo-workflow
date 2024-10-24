@@ -3,6 +3,7 @@ kind: WorkflowTemplate
 metadata:
   name: dev-argo-testing
 spec:
+  entrypoint: echo-workflow
   arguments:
     parameters:
       - name: message
