@@ -71,7 +71,7 @@ spec:
       container:
         image: alpine/git
         command: [sh, -c]
-        args: ["git clone --branch master https://github.com/TanmayRao7/nginx-helm.git && cd nginx-helm"]
+        args: ["git clone --branch release-1.1 https://github.com/theadityab/argo-testing.git"]
 
     - name: modify-configuration
       inputs:
