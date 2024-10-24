@@ -17,54 +17,23 @@ spec:
       steps:
         - - name: git-checkout
             template: git-checkout
-        - - name: modify-configuration
-            template: modify-configuration
-            arguments:
-              parameters:
-                - name: IMAGE_TAG
-                  value: "{{workflow.parameters.IMAGE_TAG}}"
-                - name: CUSTOM_TEXT
-                  value: "{{workflow.parameters.CUSTOM_TEXT}}"
-        - - name: check-configuration
-            template: check-configuration
-        - - name: git-commit-push
-            template: git-commit-push
-            arguments:
-              parameters:
-                - name: IMAGE_TAG
-                  value: "{{workflow.parameters.IMAGE_TAG}}"
-        - - name: deploy
-            template: kubectl-apply
-        - - name: sync
-            template: sync
-        - - name: deploy-to-env
-            when: "{{workflow.parameters.ENV}} == 'dev'"
-            template: deploy-to-env
-            arguments:
-              parameters:
-                - name: env
-                  value: "dev"
-        - - name: deploy-to-env
-            when: "{{workflow.parameters.ENV}} == 'test'"
-            template: deploy-to-env
-            arguments:
-              parameters:
-                - name: env
-                  value: "test"
-        - - name: deploy-to-env
-            when: "{{workflow.parameters.ENV}} == 'stage'"
-            template: deploy-to-env
-            arguments:
-              parameters:
-                - name: env
-                  value: "stage"
-        - - name: deploy-to-env
-            when: "{{workflow.parameters.ENV}} == 'prod'"
-            template: deploy-to-env
-            arguments:
-              parameters:
-                - name: env
-                  value: "prod"
+        # - - name: modify-configuration
+        #     template: modify-configuration
+        #     arguments:
+        #       parameters:
+        #         - name: IMAGE_TAG
+        #           value: "{{workflow.parameters.IMAGE_TAG}}"
+        #         - name: CUSTOM_TEXT
+        #           value: "{{workflow.parameters.CUSTOM_TEXT}}"
+        # - - name: check-configuration
+        #     template: check-configuration
+        # - - name: git-commit-push
+        #     template: git-commit-push
+        #     arguments:
+        #       parameters:
+        #         - name: IMAGE_TAG
+        #           value: "{{workflow.parameters.IMAGE_TAG}}"
+
 
   templates:
     - name: git-checkout
@@ -73,80 +42,33 @@ spec:
         command: [sh, -c]
         args: ["git clone --branch release-1.1 https://github.com/theadityab/argo-testing.git"]
 
-    - name: modify-configuration
-      inputs:
-        parameters:
-          - name: IMAGE_TAG
-          - name: CUSTOM_TEXT
-      container:
-        image: alpine
-        command: [sh, -c]
-        args: |
-          sed -i 's/tag: "[^"]*"/tag: "{{inputs.parameters.IMAGE_TAG}}"/' application_set.yaml
-          sed -i 's/homepageText: "[^"]*"/homepageText: "{{inputs.parameters.CUSTOM_TEXT}}"/' application_set.yaml
+    # - name: modify-configuration
+    #   inputs:
+    #     parameters:
+    #       - name: IMAGE_TAG
+    #       - name: CUSTOM_TEXT
+    #   container:
+    #     image: alpine
+    #     command: [sh, -c]
+    #     args: |
+    #       sed -i 's/tag: "[^"]*"/tag: "{{inputs.parameters.IMAGE_TAG}}"/' application_set.yaml
+    #       sed -i 's/homepageText: "[^"]*"/homepageText: "{{inputs.parameters.CUSTOM_TEXT}}"/' application_set.yaml
 
-    - name: check-configuration
-      container:
-        image: alpine/git
-        command: [sh, -c]
-        args: ["/usr/bin/git diff"]
+    # - name: check-configuration
+    #   container:
+    #     image: alpine/git
+    #     command: [sh, -c]
+    #     args: ["/usr/bin/git diff"]
 
-    - name: git-commit-push
-      inputs:
-        parameters:
-          - name: IMAGE_TAG
-      container:
-        image: alpine/git
-        command: [sh, -c]
-        args: |
-          git add . && \
-          git commit -m "Updated with {{inputs.parameters.IMAGE_TAG}}" && \
-          git push --set-upstream origin master
+    # - name: git-commit-push
+    #   inputs:
+    #     parameters:
+    #       - name: IMAGE_TAG
+    #   container:
+    #     image: alpine/git
+    #     command: [sh, -c]
+    #     args: |
+    #       git add . && \
+    #       git commit -m "Updated with {{inputs.parameters.IMAGE_TAG}}" && \
+    #       git push --set-upstream origin master
 
-    - name: kubectl-apply
-      container:
-        image: bitnami/kubectl
-        command: [sh, -c]
-        args: ["/opt/homebrew/bin/kubectl apply -f application_set.yaml"]
-
-    - name: sync
-      container:
-        image: alpine
-        command: [sh, -c]
-        args: ["/bin/sh deployment_check.sh nginx"]
-
-    - name: deploy-to-env
-      inputs:
-        parameters:
-          - name: env
-      steps:
-        - - name: prompt-user-for-deploy
-            template: prompt-user-for-deploy
-            arguments:
-              parameters:
-                - name: env
-                  value: "{{inputs.parameters.env}}"
-        - - name: deploy-message
-            template: deploy-message
-            arguments:
-              parameters:
-                - name: env
-                  value: "{{inputs.parameters.env}}"
-
-    - name: prompt-user-for-deploy
-      inputs:
-        parameters:
-          - name: env
-      container:
-        image: alpine
-        command: [sh, -c]
-        args: ["echo 'Promote to {{inputs.parameters.env}}: Yes or No'"]
-
-    - name: deploy-message
-      inputs:
-        parameters:
-          - name: env
-      container:
-        image: alpine
-        command: [sh, -c]
-        args: ["echo 'Deployment to {{inputs.parameters.env}}'"]
