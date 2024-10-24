@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-workflow-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/theadityab/argo-workflow.git
+    targetRevision: main  # or specify a branch, e.g., "main"
+    path: workflow  # Directory containing the workflow YAML
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
