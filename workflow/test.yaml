@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: DEV ARGO TEST
+  name: dev-argo-testing
 spec:
   arguments:
     parameters:
