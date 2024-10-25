@@ -41,9 +41,9 @@ spec:
         image: alpine/git
         command: [sh, -c]
         args: 
-          #- |
+          - |
             git clone --branch release-1.1 https://github.com/theadityab/argo-testing.git && \
-            cat project.yaml
+            ls -l
 
     # - name: modify-configuration
     #   inputs:
