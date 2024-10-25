@@ -43,6 +43,7 @@ spec:
         args: 
           - |
             git clone --branch release-1.1 https://github.com/theadityab/argo-testing.git && \
+            cd argo-testing && \
             ls -l
 
     # - name: modify-configuration
