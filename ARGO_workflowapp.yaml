@@ -28,6 +28,7 @@ spec:
         # Configure service account
         serviceAccount:
           create: true
+          name: Aditya
           
         # Configure RBAC
         rbac:
