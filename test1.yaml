@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: param-echo-workflow-
+spec:
+  entrypoint: echo-workflow
+  arguments:
+    parameters:
+      - name: message
+        value: "Hello, Argo CD!"  # Default value
+  templates:
+    - name: echo-workflow
+      inputs:
+        parameters:
+          - name: message
+      container:
+        image: alpine:3.14
+        command: [sh, -c]
+        args: ["echo {{inputs.parameters.message}}"]
+
+  ttlStrategy:
+    secondsAfterCompletion: 3600  # Automatically delete workflow after 1 hour
+    secondsAfterSuccess: 86400  # Keep successful workflows for 1 day
+    secondsAfterFailure: 604800  # Keep failed workflows for 7 days
+
+

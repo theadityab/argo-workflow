@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argo-workflows
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: argo-workflows
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 0.40.0
+    helm:
+      values: |
+        server:
+          enabled: true
+          # Disable authentication by setting authMode to client
+          authMode: client
+          
+          # Optional: Configure to skip login
+          extraArgs:
+            - --auth-mode=client
+        
+        # Configure workflow controller
+        controller:
+          # Set logging level
+          logLevel: info
+          
+        # Configure service account
+        serviceAccount:
+          create: true
+          
+        # Configure RBAC
+        rbac:
+          create: true
+          
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argo-workflows
+    
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+
+  ignoreDifferences:
+    - group: argoproj.io
+      kind: Application
+      jsonPointers:
+        - /status
